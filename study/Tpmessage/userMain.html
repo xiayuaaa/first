@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据查询</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/layui/layui.js"></script>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="layui-btn-group demoTable">
+
+        <button class="layui-btn btn-lg" data-toggle="modal" data-target="#myModal">新增</button>
+        <button class="layui-btn" data-type="getCheckData" onclick="login()">登录</button>
+        <button class="layui-btn" data-type="getCheckData" onclick="Logout()">退出</button>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+        height="500">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">新增留言</h4>
+                </div>
+                <div style="height:100px;">
+                    <!-- 留言 -->
+                    <div class="layui-form-item"></div>
+                    <label class="layui-form-label">留言：</label>
+                    <div class="layui-input-block">
+                        <input type="text" height="50" name="content" id="content" lay-verify="title" autocomplete="off"
+                            placeholder="请输入留言" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="insert()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="layui-hide" id="num" lay-filter="demo"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    <script>
+        var url = location.search; //获取页面url
+        var str = url.substr(9); //截取url字符串9位后的内容
+        var str1 = url.substr(20); //截取url字符串20位后的内容
+        var nickname = str1.split('&')[0] //用户昵称
+        var User_id = str.split('&')[0] //用户登录ID
+        var index = url.lastIndexOf("=");
+        var email = url.substring(index + 1, url.length); //email
+        var jwt = sessionStorage.getItem('User_id');
+        layui.use(['table'], function () {
+
+            //登录验证
+            if (jwt == null) {
+                alert("未登录,请先登录");
+                return false;
+            }
+            var table = layui.table;
+            var laypage = layui.laypage;
+
+            // alert(user_id);
+            //监听工具条
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                tid = data['tid']; //按钮id
+                var user_id = data['user_id']; //列表user_id
+                if (obj.event === 'add') {
+
+                } else if (obj.event === 'del') {
+                    $.ajax({
+                        url: "http://localhost:8000/delete",
+                        success: function (obj) {
+                            if (obj['code'] == 1) {
+                                window.location.reload();
+                            }
+                            else {
+                                alert(obj['message']);
+                            }
+                        },
+                        data: {
+                            "tid": tid,
+                            'jwt': jwt,
+                            'user_id': user_id
+                        },
+                        error: function (e) {
+                            debugger
+                        },
+                        dataType: 'json',
+                        type: 'get',
+                    });
+                } else if (obj.event === 'edit') {
+                    sessionStorage.setItem('user_id', user_id);
+                    $.ajax({
+                        url: 'http://localhost:8000/checkUser',
+                        success: function (obj) {
+                            if (obj['data']['uid'] == user_id) {
+                                window.location.href = "update.html?tid=" + tid + "&User_id=" + User_id + "&nickname=" + nickname + "&email=" + email + " ";
+                            } else {
+                                alert(obj['msg']);
+                            }
+                        }, error: function (e) {
+                            debugger
+                        },
+                        data: {
+                            'jwt': jwt
+                        },
+                        type: 'get',
+                        dataType: 'json'
+                    });
+
+                }
+
+
+            });
+            table.render({
+                elem: '#num',
+                height: 400,
+                url: 'http://localhost:8000/select',
+                page: true,
+                method: 'get',
+                limit: 20,
+                limits: [20, 50],
+                height: 600,
+                cols: [
+                    [{
+                        field: 'tid',
+                        title: '序号',
+                        width: 80,
+                        sort: true,
+                        fixed: 'left'
+                    },
+                    {
+                        field: 'nickname',
+                        title: '昵称'
+                    },
+                    {
+                        field: 'email',
+                        title: '邮箱'
+                    },
+                    {
+                        field: 'content',
+                        title: '留言类容'
+                    },
+                    {
+                        field: 'create_time',
+                        title: '发布时间'
+                    },
+                    {
+                        field: 'update_time',
+                        title: '修改时间',
+                    },
+                    {
+                        hide: true,
+                        field: 'user_id',
+                        title: 'user_Id',
+                        sort: true,
+                    },
+
+                    {
+                        fixed: 'right',
+                        align: 'center',
+                        toolbar: '#barDemo'
+                    }
+
+                    ]
+                ],
+
+            })
+
+        });
+        if (jwt) {
+            //注销
+            function Logout() {
+                sessionStorage.clear();
+                window.location.href = "main.html";
+            }
+        } else {
+            function insert() {
+                alert("请先登录");
+            }
+
+            function Logout() {
+                alert("请先登录");
+            }
+        }
+
+        // 登录
+        function login() {
+            window.location.href = "login.html";
+        }
+        //新增
+        function insert() {
+            var content = $('#content').val();
+            $.ajax({
+                url: 'http://localhost:8000/insert',
+                success: function (result) {
+                    window.location.href = "userMain.html?User_id=" + User_id + "&nickname=" + nickname + "&email=" + email + " ";
+                },
+                error: function (e) {
+                    debugger
+                },
+                data: {
+                    'nickname': nickname,
+                    'email': email,
+                    'content': content,
+                    'User_id': User_id, //用户登录ID
+
+                },
+                type: 'get',
+                dataType: 'json'
+            });
+        }
+    </script>
+</body>
+
+</html>

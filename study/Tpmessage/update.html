@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+  <script src="/layui/layui.js"></script>
+
+</head>
+
+<body>
+
+  <script>
+    var url = location.search;
+    var str = url.substr(5);
+    var tid = str.split('&')[0]
+    var url = location.search;
+    var str = url.substr(15);
+    var strs = str.split("&");
+    var str1 = url.substr(26);
+    var nickname = str1.split('&')[0] //用户昵称
+    var User_id = str.split('&')[0] //用户登录ID
+    var index = url.lastIndexOf("=");
+    var index1 = url.lastIndexOf("email");
+    var test = url.substring(index1 + 6, url.length);
+    var email = test.split('&')[0]; //邮箱
+    var token = sessionStorage.getItem('User_id');
+    var user_id = sessionStorage.getItem('user_id');;
+
+    function sub() {
+      var content = $('#content').val();
+      // if (content == null) {
+      //   return false;
+      // }
+      $.ajax({
+        url: 'http://localhost:8000/update',
+        success: function (result) {
+          if (result['code'] == 1) {
+            alert(result['message']);
+            window.location.href = "userMain.html?User_id=" + User_id + "&nickname=" + nickname + "&email=" + email + "";
+          } else {
+            alert(result['message']);
+          }
+
+        },
+        error: function (e) {
+          debugger
+        },
+        data: {
+          'tid': tid,
+          'content': content,
+          'user_id': user_id,
+          'token': token
+
+        },
+        dataType: 'json',
+        type: 'get',
+
+      });
+    }
+  </script>
+  <script>
+    //返回用户主界面
+    function retur() {
+      window.location.href = "userMain.html?user_id=" + User_id + "&nickname=" + nickname + "&email=" + email + "";
+    }
+  </script>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">留言</label>
+    <div class="layui-input-block">
+      <input type="text" name="content" id="content" lay-verify="required" lay-reqtext="必填项，岂能为空？" placeholder="请输入留言"
+        autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="reset" class="layui-btn" lay-submit="" lay-filter="demo1" onclick="sub()">立即提交</button>
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      <button type="reset" class="layui-btn layui-btn-primary" onclick="retur()">返回</button>
+    </div>
+  </div>
+</body>
+
+</html>

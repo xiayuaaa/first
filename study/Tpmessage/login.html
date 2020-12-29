@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script src="/layui/layui.js"></script>
+</head>
+
+<body>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>用户登录</legend>
+    </fieldset>
+    <script>
+        //跳转注册页面
+        function register() {
+            window.location.href = "register.html"
+        }
+    </script>
+    <script>
+        //登录
+        function login() {
+            var username = $('#username').val();
+            var password = $('#password').val();
+            if (username.length != 0 && password.length != 0) {
+
+                $.ajax({
+                    url: 'http://localhost:8000/login',
+                    success: function (arr) {
+
+
+                        if (arr['code'] == 1) {
+                            sessionStorage.setItem('User_id', arr['data']['jwt']);//存储登录用户ID
+                            var id = arr['data']['id'];
+                            var nickname = arr['data']['nickname'];
+                            var email = arr['data']['email'];
+                            alert(arr['msg']);
+                            window.location.href = "userMain.html?User_id=" + id + "&nickname=" + nickname + "&email=" + email + " ";
+                        } else {
+                            alert(arr['msg']);
+                        }
+
+                    },
+                    error: function (e) {
+                        debugger
+                    },
+                    data: {
+                        "username": username,
+                        "password": password,
+                    },
+                    dataType: 'json',
+                    type: 'get'
+
+                });
+
+
+            } else if (username.length == 0 && password.length != 0) {
+                alert("用户名不能为空");
+            } else if (username.length != 0 && password.length == 0) {
+                alert("密码不能为空");
+            } else {
+                alert("信息不能为空");
+            }
+        }
+
+        //返回
+        function retn() {
+            window.location.href = "main.html";
+        }
+    </script>
+
+    <!-- 用户名 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">用户名：</label>
+    <div class="layui-input-block">
+        <input type="text" id="username" lay-verify="title" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+    </div>
+    </div>
+    <!-- 密码 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">密码：</label>
+    <div class="layui-input-block">
+        <input type="password" id="password" autocomplete="off" placeholder="请输入密码" class="layui-input">
+    </div>
+    </div>
+
+
+    <div class="layui-input-block">
+        <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="LAY_demo_editor"></textarea>
+    </div>
+
+
+
+    <!-- 登录注册按钮 -->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="demo1" onclick="login()">登录</button>
+            <a type="button" class="layui-btn" lay-submit="" lay-filter="demo2" onclick="register()">注册</a>
+            <button type="button" onclick="retn()" class="layui-btn" lay-submit="" lay-filter="demo3">返回</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+
+        </div>
+    </div>
+    <hr>
+
+</body>
+
+</html>

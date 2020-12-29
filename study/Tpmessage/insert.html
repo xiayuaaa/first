@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script src="/layui/layui.js"></script>
+
+    <script>
+        var url = location.search;
+        var str = url.substr(9);
+        var strs = str.split("&");
+        var str1 = url.substr(20);
+        var nickname = str1.split('&')[0] //用户昵称
+        var User_id = str.split('&')[0] //用户登录ID
+        var index = url.lastIndexOf("=");
+        var email = url.substring(index + 1, url.length); //email
+        function insert() {
+            var content = $('#content').val();
+            $.ajax({
+                url: 'http://localhost:8000/insert',
+                success: function (result) {
+                    if (result['code'] == 1) {
+                        alert(result['message']);
+                        window.location.href = "userMain.html?User_id=" + User_id + "&nickname=" + nickname + "&email=" + email + " ";
+                    } else {
+                        alert(result['message']);
+                    }
+
+
+                },
+                error: function (e) {
+                    console.log(e);
+                    // debugger
+                },
+                data: {
+                    'nickname': nickname,
+                    'email': email,
+                    'content': content,
+                    'User_id': User_id, //用户登录ID
+
+                },
+                type: 'get',
+                dataType: 'json'
+            });
+        }
+    </script>
+    <!-- 留言 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">留言：</label>
+    <div class="layui-input-block">
+        <input type="text" name="content" id="content" lay-verify="title" autocomplete="off" placeholder="请输入留言"
+            class="layui-input">
+    </div>
+    </div>
+
+
+
+    <div class="layui-input-block">
+        <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="content"></textarea>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1" onclick="insert()">确定</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+
+        </div>
+    </div>
+    </form>
+</body>
+
+</html>
