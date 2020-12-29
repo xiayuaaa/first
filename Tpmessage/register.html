@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script src="/layui/layui.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function register() {
+            var nickname = $('#nickname').val();
+            var username = $('#username').val();
+            var passWord = $('#password').val();
+            var email = $('#email').val();
+            var tel = $('#tel').val();
+            $.ajax({
+                url: 'http://localhost:8000/register',
+                success: function (result) {
+                    if (result['code'] == 1) {
+                        alert(result['message']);
+                        window.location.href = "login.html";
+                    }else{
+                        alert(result['message']);
+                    }
+                    
+                },
+                error: function (e) {
+                    debugger
+                },
+                data: {
+                    'nickname': nickname,
+                    'username': username,
+                    'password': passWord,
+                    'email': email,
+                    'tel': tel
+
+                },
+                type: 'get',
+                dataType: 'json'
+            });
+        }
+
+        function retn() {
+            window.location.href = "login.html";
+        }
+    </script>
+    <!-- 昵称 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">昵称</label>
+    <div class="layui-input-block">
+        <input type="text" id="nickname" lay-verify="title" autocomplete="off" placeholder="请输入昵称" class="layui-input">
+    </div>
+    </div>
+    <!-- 用户名 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">用户名：</label>
+    <div class="layui-input-block">
+        <input type="text" id="username" lay-verify="title" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+    </div>
+    </div>
+    <!-- 密码 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">密码：</label>
+    <div class="layui-input-block">
+        <input type="password" id="password" lay-verify="title" autocomplete="off" placeholder="请输入密码"
+            class="layui-input">
+    </div>
+    </div>
+    <!-- 邮箱 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">邮箱</label>
+    <div class="layui-input-block">
+        <input type="text" id="email" lay-verify="title" autocomplete="off" placeholder="请输入注册邮箱" class="layui-input">
+    </div>
+    </div>
+    <!-- 电话 -->
+    <div class="layui-form-item"></div>
+    <label class="layui-form-label">电话</label>
+    <div class="layui-input-block">
+        <input type="text" id="tel" lay-verify="title" autocomplete="off" placeholder="请输入手机号" class="layui-input">
+    </div>
+    </div>
+
+    <div class="layui-input-block">
+        <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="LAY_demo_editor"></textarea>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" onclick="register()" class="layui-btn" lay-submit="" lay-filter="demo1">立刻注册</button>
+            <button type="button" onclick="retn()" class="layui-btn" lay-submit="" lay-filter="demo2">返回</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+
+        </div>
+    </div>
+    </form>
+</body>
+
+</html>
